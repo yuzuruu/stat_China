@@ -140,7 +140,7 @@ map_N_student_china <-
   )
 # save in pdf format
 ggsave(
-  "map_N_student_china",
+  "map_N_student_china.pdf",
   plot = map_N_student_china,
   height = 200,
   witdh = 200,
