@@ -143,6 +143,6 @@ ggsave(
   "map_N_student_china.pdf",
   plot = map_N_student_china,
   height = 200,
-  witdh = 200,
+  width = 200,
   units = "mm"
 )
