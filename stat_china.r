@@ -13,7 +13,7 @@
 #
 # ?ggplot2::ggplot
 #
-# Option 2 Ak Google
+# Option 2 Ask Google
 # 
 # -----read.library -----
 library(tidyverse)
@@ -22,9 +22,21 @@ library(khroma)
 library(ggrepel)
 #
 # ----- read.data -----
+# read shapefiles of China
+Province_China <- 
+  sf::read_sf(
+    "gadm41_CHN_shp/gadm41_CHN_1.shp"
+  ) %>% 
+  dplyr::tibble() %>% 
+  dplyr::mutate(
+    dplyr::across(where(is.character),factor)
+  ) %>% 
+  # remove unidentified areas
+  dplyr::filter(!stringr::str_detect(GID_1, "^Z"))
+# read data including the N. of university in China
 university_list_china <- 
   # read the data of the N. of student
-  readxl::read_excel("List_of_Univ_Cn.xlsx") %>% 
+  readxl::read_excel("List_of_Univ_Cn_02.xlsx") %>% 
   # cleaning the data
   # The data inludes unnecessary strings and line breaks.
   # They might be a cause of malfunction and we need to remove the.
@@ -56,18 +68,31 @@ university_list_china <-
       where(is.character),
       factor
       ),
+    # correct names of provinces in accordance with ones used in the shapefiles
+    # To confirm whether provinces match or not, we can use the code below.
+    # province_data <- levels(university_list_china$province)
+    # 
+    # Step 1 Assign names of the target provinces from two objects
+    # province_shapefiles <- levels(Province_China$NAME_1)
+    # Step 2 Using set operator, clarify included provinces 
+    # setdiff(province_shapefiles, province_data)
+    # setdiff(province_data, province_shapefiles)
+    # 
+    # The codes above found some unmatched provinces corrected below.
+    # 
     province = stringr::str_replace_all(province, "Shanxi", "Shaanxi") %>% factor(),
-    province = stringr::str_replace_all(province, "Mongolia", "Nei Mongol") %>% factor()
+    province = stringr::str_replace_all(province, "Mongolia", "Nei Mongol") %>% factor(),
+    province = stringr::str_replace_all(province, "guangdong", "Guangdong") %>% factor(),
+    province = stringr::str_replace_all(province, "guangxi", "Guangxi") %>% factor(),
+    province = stringr::str_replace_all(province, "henan", "Henan") %>% factor(),
+    province = stringr::str_replace_all(province, "hubei", "Hubei") %>% factor(),
+    province = stringr::str_replace_all(province, "hebei", "Hebei") %>% factor(),
+    province = stringr::str_replace_all(province, "hunan", "Hunan") %>% factor(),
+    province = stringr::str_replace_all(province, "Xinjiang", "Xinjiang Uygur") %>% factor(),
+    province = stringr::str_replace_all(province, "Xi'an", "Shanxi") %>% factor(),
+    province = stringr::str_replace_all(province, "Tibetan", "Xizang") %>% factor(),
+    province = stringr::str_replace_all(province, "Ningxia", "Ningxia Hui") %>% factor()
   ) 
-# read shapefiles of China
-Province_China <- 
-  sf::read_sf(
-    "gadm41_CHN_shp/gadm41_CHN_1.shp"
-  ) %>% 
-  dplyr::tibble() %>% 
-  dplyr::mutate(
-    dplyr::across(where(is.character),factor)
-  )
 #
 # ----- draw.map -----
 # make a summary table of the data
@@ -142,7 +167,7 @@ map_N_student_china <-
 ggsave(
   "map_N_student_china.pdf",
   plot = map_N_student_china,
-  height = 200,
-  width = 200,
+  height = 400,
+  width = 400,
   units = "mm"
 )
